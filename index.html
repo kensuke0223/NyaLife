@@ -10,27 +10,25 @@
       --bg1:#fff4dc; --bg2:#ffe7c2; --panel:rgba(255,255,255,0.9);
       --panel-border:#f4d89c; --ink:#3d2d28; --muted:#7f665d;
       --primary:#ffb35d; --accent:#ff9f82; --good:#75d3a6; --shadow:rgba(89,61,39,0.14);
-      --tap-size:56px; /* recommended touch target */
+      --tap-size:56px;
     }
 
     *{box-sizing:border-box}
     html,body{height:100%;margin:0;font-family:"Segoe UI","Hiragino Sans","Yu Gothic",sans-serif;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:var(--ink);-webkit-font-smoothing:antialiased}
 
-    .app{max-width:980px;margin:0 auto;padding:20px 16px 100px; /* bottom padding for mobile bar */}
+    .app{max-width:980px;margin:0 auto;padding:20px 16px 100px;}
     header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
     h1{margin:0;font-size:1.6rem}
     .badge{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.85);border:2px solid var(--panel-border);font-weight:800;color:var(--muted)}
 
-    /* Layout: desktop/tablet uses two columns; mobile is single column */
     .layout{display:grid;grid-template-columns:1.5fr 0.9fr;gap:18px}
     .panel{background:var(--panel);border:3px solid var(--panel-border);border-radius:20px;padding:16px;box-shadow:0 12px 28px var(--shadow)}
     .stage{position:relative;height:320px;border-radius:18px;background:linear-gradient(180deg,#fdfbf7,#ebf6ff);overflow:hidden;border:2px dashed #f3d9a6}
 
-    .cat{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);width:160px;height:160px;display:grid;place-items:center;user-select:none}
-    .cat img{width:160px;height:160px;image-rendering:pixelated;display:block}
+    .cat{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);width:160px;height:160px;display:grid;place-items:center;user-select:none;transition:transform 0.18s ease;}
+    .cat img{width:160px;height:160px;image-rendering:pixelated;display:block;filter:drop-shadow(0 8px 12px rgba(80,55,30,0.14));}
     .speech{position:absolute;right:12px;top:12px;background:rgba(255,255,255,0.9);border:2px solid var(--panel-border);border-radius:14px;padding:8px 10px;font-weight:800;color:var(--muted)}
 
-    /* Stats and bars larger for touch */
     .bars{margin-top:12px;display:grid;gap:9px}
     .bar-frame{position:relative;height:22px;border-radius:999px;background:#f4efe7;border:1px solid #e4d8b8;overflow:hidden}
     .bar-fill{position:absolute;inset:0 auto 0 0;width:40%;border-radius:inherit;transition:width 0.25s ease}
@@ -38,7 +36,6 @@
     .bar-happiness{background:linear-gradient(90deg,#6ee0b0,#4db6d9)}
     .bar-energy{background:linear-gradient(90deg,#b8b0ff,#7f9aff)}
 
-    /* Side controls (desktop) */
     .side{display:grid;gap:12px}
     .controls{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
     button{appearance:none;border:none;border-radius:12px;padding:12px;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 8px 16px rgba(80,53,30,0.06)}
@@ -49,32 +46,27 @@
     .log{list-style:none;padding:0;margin:0;display:grid;gap:8px}
     .log li{background:#fffaf3;border:1px solid #f1ddb2;border-radius:10px;padding:8px;color:var(--muted)}
 
-    /* MOBILE: simplified layout, larger tap targets, fixed bottom bar */
     .mobile-bar{display:none;position:fixed;left:0;right:0;bottom:0;padding:10px 8px;background:linear-gradient(180deg,rgba(255,255,255,0.97),rgba(255,255,255,0.95));border-top:2px solid #f1d9a5;box-shadow:0 -8px 20px rgba(60,40,20,0.08);z-index:60}
     .mobile-bar .btn{min-width:0;flex:1;margin:0 6px;border-radius:14px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800}
     .mobile-bar .btn .label{font-size:12px;margin-top:4px}
 
-    /* larger touch area for buttons elsewhere */
     .tap-large{min-height:var(--tap-size);display:flex;align-items:center;justify-content:center;border-radius:12px}
-
-    /* ensure content not hidden behind mobile bar */
     .app.with-mobile-padding{padding-bottom:120px}
 
-    /* responsive rules */
     @media (max-width:900px){.layout{grid-template-columns:1fr}.side{order:3}}
     @media (max-width:600px){
       .layout{grid-template-columns:1fr}
-      .side{display:none} /* hide desktop side controls on small screens */
+      .side{display:none}
       .mobile-bar{display:flex;gap:6px}
       .app{padding-bottom:140px}
       h1{font-size:1.4rem}
-      .cat{width:140px;height:140px;font-size:110px;bottom:68px}
+      .cat{width:140px;height:140px;bottom:68px}
+      .cat img{width:140px;height:140px}
       .stage{height:300px}
       .bars .bar-frame{height:20px}
       button{font-size:0.98rem}
     }
 
-    /* remove tap highlight on mobile */
     a,button{ -webkit-tap-highlight-color: rgba(0,0,0,0); }
   </style>
 </head>
@@ -122,7 +114,6 @@
             <div id="levelValue" style="font-size:1.1rem;font-weight:900">1</div>
           </div>
         </div>
-
       </section>
 
       <aside class="side">
@@ -148,7 +139,6 @@
       </aside>
     </main>
 
-    <!-- Mobile fixed action bar (shows on small screens) -->
     <div class="mobile-bar" role="toolbar" aria-label="アクション">
       <button class="btn action-primary" data-action="feed" title="ごはん">🍲<div class="label">ごはん</div></button>
       <button class="btn action-primary" data-action="play" title="遊ぶ">🎾<div class="label">遊ぶ</div></button>
@@ -162,32 +152,24 @@
     const STORAGE_KEY = "nyalife-rpg-mobile-v3";
     const defaultState = {name:"たま",level:1,xp:0,hunger:70,happiness:75,energy:80,coins:0,day:1,log:["今日も元気に過ごしてるにゃ！"],eventMood:"普通"};
 
-    // --- SVG frames for a simple pixel-art cat ---
-    const frameSVGs = [];
-
-    // Frame 1: neutral
-    frameSVGs.push(`
+    // Pixel-art cat frames: idle + dance + action states
+    const frameSVGs = [
+      `
       <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'>
         <rect width='16' height='16' fill='transparent' />
-        <!-- body -->
         <rect x='3' y='1' width='10' height='1' fill='%23ffcc99'/>
         <rect x='2' y='2' width='12' height='1' fill='%23ffcc99'/>
         <rect x='1' y='3' width='14' height='3' fill='%23ffcc99'/>
         <rect x='2' y='6' width='12' height='3' fill='%23ffcc99'/>
         <rect x='3' y='9' width='10' height='3' fill='%23ffcc99'/>
-        <!-- ears (pink tips) -->
         <rect x='2' y='2' width='1' height='1' fill='%23ff9fb0'/>
         <rect x='13' y='2' width='1' height='1' fill='%23ff9fb0'/>
-        <!-- eyes -->
         <rect x='5' y='5' width='1' height='1' fill='%23000000'/>
         <rect x='10' y='5' width='1' height='1' fill='%23000000'/>
-        <!-- mouth -->
         <rect x='8' y='7' width='1' height='1' fill='%237a5238'/>
       </svg>
-    `);
-
-    // Frame 2: blink (eyes closed)
-    frameSVGs.push(`
+      `,
+      `
       <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'>
         <rect width='16' height='16' fill='transparent' />
         <rect x='3' y='1' width='10' height='1' fill='%23ffcc99'/>
@@ -197,21 +179,17 @@
         <rect x='3' y='9' width='10' height='3' fill='%23ffcc99'/>
         <rect x='2' y='2' width='1' height='1' fill='%23ff9fb0'/>
         <rect x='13' y='2' width='1' height='1' fill='%23ff9fb0'/>
-        <!-- closed eyes (lines) -->
         <rect x='5' y='5' width='2' height='1' fill='%237a5238'/>
         <rect x='9' y='5' width='2' height='1' fill='%237a5238'/>
         <rect x='8' y='7' width='1' height='1' fill='%237a5238'/>
       </svg>
-    `);
-
-    // Frame 3: paw up
-    frameSVGs.push(`
+      `,
+      `
       <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'>
         <rect width='16' height='16' fill='transparent' />
         <rect x='3' y='1' width='10' height='1' fill='%23ffcc99'/>
         <rect x='2' y='2' width='12' height='1' fill='%23ffcc99'/>
         <rect x='1' y='3' width='14' height='3' fill='%23ffcc99'/>
-        <!-- paw raised: clear a pixel and draw paw -->
         <rect x='2' y='6' width='10' height='1' fill='%23ffcc99'/>
         <rect x='11' y='6' width='3' height='2' fill='%23ffcc99'/>
         <rect x='3' y='9' width='10' height='3' fill='%23ffcc99'/>
@@ -221,73 +199,104 @@
         <rect x='10' y='5' width='1' height='1' fill='%23000000'/>
         <rect x='8' y='7' width='1' height='1' fill='%237a5238'/>
       </svg>
-    `);
+      `,
+      // dance frame left
+      `
+      <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'>
+        <rect width='16' height='16' fill='transparent' />
+        <rect x='4' y='1' width='8' height='1' fill='%23ffcc99'/>
+        <rect x='3' y='2' width='10' height='1' fill='%23ffcc99'/>
+        <rect x='2' y='3' width='12' height='3' fill='%23ffcc99'/>
+        <rect x='1' y='6' width='6' height='2' fill='%23ffcc99'/>
+        <rect x='9' y='6' width='6' height='2' fill='%23ffcc99'/>
+        <rect x='2' y='8' width='5' height='2' fill='%23ffcc99'/>
+        <rect x='9' y='8' width='5' height='2' fill='%23ffcc99'/>
+        <rect x='4' y='2' width='1' height='1' fill='%23ff9fb0'/>
+        <rect x='11' y='2' width='1' height='1' fill='%23ff9fb0'/>
+        <rect x='5' y='5' width='1' height='1' fill='%23000000'/>
+        <rect x='10' y='5' width='1' height='1' fill='%23000000'/>
+        <rect x='8' y='7' width='1' height='1' fill='%237a5238'/>
+      </svg>
+      `,
+      // dance frame right
+      `
+      <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'>
+        <rect width='16' height='16' fill='transparent' />
+        <rect x='4' y='1' width='8' height='1' fill='%23ffcc99'/>
+        <rect x='3' y='2' width='10' height='1' fill='%23ffcc99'/>
+        <rect x='2' y='3' width='12' height='3' fill='%23ffcc99'/>
+        <rect x='2' y='6' width='6' height='2' fill='%23ffcc99'/>
+        <rect x='8' y='6' width='6' height='2' fill='%23ffcc99'/>
+        <rect x='3' y='8' width='5' height='2' fill='%23ffcc99'/>
+        <rect x='8' y='8' width='5' height='2' fill='%23ffcc99'/>
+        <rect x='4' y='2' width='1' height='1' fill='%23ff9fb0'/>
+        <rect x='11' y='2' width='1' height='1' fill='%23ff9fb0'/>
+        <rect x='5' y='5' width='1' height='1' fill='%23000000'/>
+        <rect x='10' y='5' width='1' height='1' fill='%23000000'/>
+        <rect x='8' y='7' width='1' height='1' fill='%237a5238'/>
+      </svg>
+      `
+    ];
 
-    // Convert SVG string -> data URL when needed
-    function svgToDataUrl(svg) {
-      return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
-    }
+    function svgToDataUrl(svg) { return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg); }
 
-    // --- Game state & UI ---
     function clamp(v,a,b){return Math.min(Math.max(v,a),b)}
     function loadState(){try{const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return JSON.parse(JSON.stringify(defaultState));return {...JSON.parse(JSON.stringify(defaultState)),...JSON.parse(raw)} }catch(e){console.warn(e);return JSON.parse(JSON.stringify(defaultState))}}
     function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
     function addLog(t){state.log.unshift(t);state.log=state.log.slice(0,6)}
     function getMoodText(){if(state.hunger<25)return"お腹すいたにゃ";if(state.happiness<25)return"さみしいにゃ";if(state.energy<25)return"眠いにゃ";if(state.happiness>80&&state.hunger>55)return"最高に幸せ";return"元気"}
-    function getCatFace(){const m=getMoodText();if(m.includes("眠"))return"😴";if(m.includes("お腹"))return"😿";if(m.includes("さみ"))return"😹";if(m.includes("最高"))return"😺";return"🐱"}
-
-    function gainXP(a){state.xp+=a;while(state.xp>=100){state.xp-=100;state.level+=1;state.coins+=10;addLog(`レベルアップ！ Lv.${state.level} にゃ！`);}}
-    function updateUI(){const h=clamp(state.hunger,0,100),p=clamp(state.happiness,0,100),e=clamp(state.energy,0,100);document.getElementById('dayValue').textContent=String(state.day);document.getElementById('coinValue').textContent=String(state.coins);document.getElementById('catName').textContent=state.name;document.getElementById('levelValue').textContent=String(state.level);document.getElementById('hungerText').textContent=`${h}%`;document.getElementById('happinessText').textContent=`${p}%`;document.getElementById('energyText').textContent=`${e}%`;document.getElementById('hungerBar').style.width=`${h}%`;document.getElementById('happinessBar').style.width=`${p}%`;document.getElementById('energyBar').style.width=`${e}%`;document.getElementById('eventText').textContent=`今日の運勢：${state.eventMood}`;document.getElementById('speechBox').textContent=getMoodText();document.getElementById('catFace').setAttribute('aria-label',getMoodText());updateSprite();const log=document.getElementById('logList');log.innerHTML='';state.log.forEach(entry=>{const li=document.createElement('li');li.textContent=entry;log.appendChild(li)});}
-
-    // Sprite animation: cycle frames while idle; when performing actions, trigger a short animation
-    const spriteEl = document.getElementById('catSprite');
-    let spriteIndex = 0;
-    let spriteTimer = null;
-    let idleInterval = 500; // ms between frames
 
     function updateSprite(){
-      // choose frame based on current mood occasionally
+      const spriteEl = document.getElementById('catSprite');
       if(!spriteEl) return;
       spriteEl.src = svgToDataUrl(frameSVGs[spriteIndex % frameSVGs.length]);
     }
 
     function startIdleAnimation(){
       if(spriteTimer) clearInterval(spriteTimer);
-      spriteTimer = setInterval(()=>{
-        // small bob effect with CSS transform
+      spriteTimer = setInterval(() => {
         const cat = document.getElementById('catFace');
-        if(cat) cat.style.transform = 'translateX(-50%) translateY(-6px)';
-        setTimeout(()=>{ if(cat) cat.style.transform = 'translateX(-50%) translateY(0)'; }, 260);
-
+        if(cat){
+          const sway = (Math.sin(Date.now()/180) * 6);
+          cat.style.transform = `translateX(-50%) rotate(${sway}deg) translateY(${Math.abs(Math.sin(Date.now()/280))*4}px)`;
+        }
         spriteIndex = (spriteIndex + 1) % frameSVGs.length;
         updateSprite();
-      }, idleInterval);
+      }, 430);
     }
 
-    function playActionAnimation(frames = [0,2,0], frameMs = 160){
+    function playSequence(frames, ms){
       if(spriteTimer) clearInterval(spriteTimer);
       let i = 0;
-      const seq = setInterval(()=>{
+      const seq = setInterval(() => {
         spriteIndex = frames[i % frames.length];
         updateSprite();
+        const cat = document.getElementById('catFace');
+        if(cat){
+          const tap = i % 2 === 0 ? 10 : -10;
+          cat.style.transform = `translateX(-50%) rotate(${tap}deg)`;
+        }
         i++;
         if(i >= frames.length){
           clearInterval(seq);
           startIdleAnimation();
         }
-      }, frameMs);
+      }, ms);
     }
+
+    function gainXP(a){state.xp+=a;while(state.xp>=100){state.xp-=100;state.level+=1;state.coins+=10;addLog(`レベルアップ！ Lv.${state.level} にゃ！`);}}
+    function updateUI(){const h=clamp(state.hunger,0,100),p=clamp(state.happiness,0,100),e=clamp(state.energy,0,100);document.getElementById('dayValue').textContent=String(state.day);document.getElementById('coinValue').textContent=String(state.coins);document.getElementById('catName').textContent=state.name;document.getElementById('levelValue').textContent=String(state.level);document.getElementById('hungerText').textContent=`${h}%`;document.getElementById('happinessText').textContent=`${p}%`;document.getElementById('energyText').textContent=`${e}%`;document.getElementById('hungerBar').style.width=`${h}%`;document.getElementById('happinessBar').style.width=`${p}%`;document.getElementById('energyBar').style.width=`${e}%`;document.getElementById('eventText').textContent=`今日の運勢：${state.eventMood}`;document.getElementById('speechBox').textContent=getMoodText();const log=document.getElementById('logList');log.innerHTML='';state.log.forEach(entry=>{const li=document.createElement('li');li.textContent=entry;log.appendChild(li)});updateSprite();}
 
     function randomEvent(){const ev=[{text:'お散歩でコウラさんと出会ったにゃ！',mood:'いい日',bonus:{coins:8,happiness:6}},{text:'日向ぼっこで大満足だったにゃ。',mood:'晴れ',bonus:{happiness:12}},{text:'キッチンでおやつの匂いを嗅いだにゃ！',mood:'ラッキー',bonus:{hunger:10,coins:5}},{text:'小さな声で「もっと遊んで」と言ってるにゃ。',mood:'普通',bonus:{happiness:8}}];const pick=ev[Math.floor(Math.random()*ev.length)];state.eventMood=pick.mood;if(pick.bonus.coins)state.coins+=pick.bonus.coins;if(pick.bonus.happiness)state.happiness=clamp(state.happiness+pick.bonus.happiness,0,100);if(pick.bonus.hunger)state.hunger=clamp(state.hunger+pick.bonus.hunger,0,100);addLog(pick.text);setMessage(pick.text);saveState();updateUI()}
 
     function setMessage(m){document.getElementById('messageBox')?.textContent=m}
 
     function performAction(type){
-      if(type==='feed'){state.hunger=clamp(state.hunger+22,0,100);state.happiness=clamp(state.happiness+8,0,100);gainXP(12);addLog('ご飯で満腹になったにゃ！');setMessage('おいしいごはんで、満足そうな顔にゃ！');playActionAnimation([2,0,1,0],140)}
-      if(type==='play'){state.happiness=clamp(state.happiness+20,0,100);state.energy=clamp(state.energy-12,0,100);state.hunger=clamp(state.hunger-8,0,100);gainXP(16);addLog('遊んで楽しかったにゃ！');setMessage('おもいっきり遊んで、にゃんと笑ってるにゃ！');playActionAnimation([0,2,0,2,0],120)}
-      if(type==='pet'){state.happiness=clamp(state.happiness+14,0,100);state.energy=clamp(state.energy+5,0,100);gainXP(8);addLog('なでられて幸せにゃ');setMessage('なでるとすぐに甘えてくる、最高のパートナーにゃ！');playActionAnimation([1,0,1],220)}
-      if(type==='sleep'){state.energy=clamp(state.energy+28,0,100);state.hunger=clamp(state.hunger-10,0,100);state.happiness=clamp(state.happiness+6,0,100);gainXP(10);addLog('ぐっすり眠って元気になったにゃ');setMessage('良い夢を見て、��っかりリフレッシュしたにゃ！');playActionAnimation([1,1,0],300)}
-      if(type==='shop'){if(state.coins>=15){state.coins-=15;state.happiness=clamp(state.happiness+12,0,100);state.hunger=clamp(state.hunger+8,0,100);gainXP(12);addLog('おやつを買って喜んだにゃ！');setMessage('豪華おやつでさらに幸せにゃ！');playActionAnimation([2,0,2],120)}else{addLog('コインが足りないにゃ…');setMessage('おやつを買うにはコインが15必要だにゃ')}}
+      if(type==='feed'){state.hunger=clamp(state.hunger+22,0,100);state.happiness=clamp(state.happiness+8,0,100);gainXP(12);addLog('ご飯で満腹になったにゃ！');setMessage('おいしいごはんで、満足そうな顔にゃ！');playSequence([0,2,0,1,0],140)}
+      if(type==='play'){state.happiness=clamp(state.happiness+20,0,100);state.energy=clamp(state.energy-12,0,100);state.hunger=clamp(state.hunger-8,0,100);gainXP(16);addLog('遊んで楽しかったにゃ！');setMessage('おもいっきり遊んで、にゃんと笑ってるにゃ！');playSequence([3,4,3,4,0],120)}
+      if(type==='pet'){state.happiness=clamp(state.happiness+14,0,100);state.energy=clamp(state.energy+5,0,100);gainXP(8);addLog('なでられて幸せにゃ');setMessage('なでるとすぐに甘えてくる、最高のパートナーにゃ！');playSequence([1,0,1,0],180)}
+      if(type==='sleep'){state.energy=clamp(state.energy+28,0,100);state.hunger=clamp(state.hunger-10,0,100);state.happiness=clamp(state.happiness+6,0,100);gainXP(10);addLog('ぐっすり眠って元気になったにゃ');setMessage('良い夢を見て、すっかりリフレッシュしたにゃ！');playSequence([1,0,1,0],220)}
+      if(type==='shop'){if(state.coins>=15){state.coins-=15;state.happiness=clamp(state.happiness+12,0,100);state.hunger=clamp(state.hunger+8,0,100);gainXP(12);addLog('おやつを買って喜んだにゃ！');setMessage('豪華おやつでさらに幸せにゃ！');playSequence([0,2,0,3,0],140)}else{addLog('コインが足りないにゃ…');setMessage('おやつを買うにはコインが15必要だにゃ')}}
 
       state.day+=1;saveState();updateUI();
     }
@@ -300,10 +309,9 @@
     document.getElementById('saveBtn')?.addEventListener('click',()=>{saveState();setMessage('セーブしたにゃ！')})
     document.getElementById('resetBtn')?.addEventListener('click',resetGame)
 
-    // Init
     let state=loadState();
-    // start sprite and UI
-    spriteIndex = 0;
+    let spriteIndex = 0;
+    let spriteTimer = null;
     updateSprite();
     startIdleAnimation();
     updateUI();
