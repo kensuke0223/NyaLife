@@ -1,1 +1,432 @@
-<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>NyaLife Phase1</title><style>body{margin:0;font-family:sans-serif;background:#fff2d7;text-align:center}.container{max-width:700px;margin:auto;padding:20px}.cat{font-size:150px}.panel{background:#fff;padding:20px;border-radius:15px;margin-top:20px;box-shadow:0 0 10px rgba(0,0,0,.1)}button{padding:12px 20px;margin:5px;border:none;border-radius:10px;cursor:pointer}.feed{background:#ffb703}.play{background:#8ecae6}.sleep{background:#bdb2ff}.reset{background:#ef476f;color:#fff}.bar{width:100%;height:25px;background:#ddd;border-radius:20px;overflow:hidden}.fill{height:100%}.hunger{background:#ffb703}.happy{background:#06d6a0}input{padding:10px}</style></head><body><div class="container"><h1>🐱 NyaLife</h1><div class="cat">🐱</div><div class="panel"><p>猫の名前：<input id="catName"><button onclick="saveName()">決定</button></p><h2 id="displayName">たま</h2><p>レベル:<span id="level">1</span></p><p>経験値:<span id="xp">0</span>/100</p><p>空腹度</p><div class="bar"><div class="fill hunger" id="hungerBar"></div></div><p>幸福度</p><div class="bar"><div class="fill happy" id="happyBar"></div></div><br><button class="feed" onclick="feed()">🍖 ごはん</button><button class="play" onclick="play()">🎾 遊ぶ</button><button class="sleep" onclick="sleepCat()">💤 寝る</button><button class="reset" onclick="resetGame()">🗑 リセット</button><div id="message"></div></div></div><script>let cat={name:'たま',level:1,xp:0,hunger:50,happy:50};function loadGame(){const s=localStorage.getItem('nyalife');if(s)cat=JSON.parse(s);updateUI()}function saveGame(){localStorage.setItem('nyalife',JSON.stringify(cat))}function updateUI(){displayName.textContent=cat.name;level.textContent=cat.level;xp.textContent=cat.xp;hungerBar.style.width=cat.hunger+'%';happyBar.style.width=cat.happy+'%';saveGame()}function showMessage(t){message.textContent=t}function gainXP(a){cat.xp+=a;if(cat.xp>=100){cat.level++;cat.xp-=100;showMessage('🎉 レベルアップ！')}updateUI()}function feed(){cat.hunger=Math.min(100,cat.hunger+20);gainXP(10);showMessage('😺 おいしいにゃ！')}function play(){cat.happy=Math.min(100,cat.happy+20);gainXP(15);showMessage('😻 たのしいにゃ！')}function sleepCat(){cat.hunger=Math.max(0,cat.hunger-10);cat.happy=Math.min(100,cat.happy+10);gainXP(8);showMessage('💤 ぐっすり寝たにゃ')}function saveName(){const v=catName.value;if(v.trim()){cat.name=v;updateUI();showMessage('🐾 名前を変更しました')}}function resetGame(){if(confirm('セーブデータを削除しますか？')){localStorage.removeItem('nyalife');location.reload()}}setInterval(()=>{cat.hunger=Math.max(0,cat.hunger-1);cat.happy=Math.max(0,cat.happy-1);updateUI()},30000);loadGame();</script></body></html>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NyaLife Phase2A</title>
+
+<style>
+body{
+  margin:0;
+  background:#fff2d7;
+  font-family:sans-serif;
+  text-align:center;
+}
+
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:20px;
+}
+
+#scene{
+  width:100%;
+  height:400px;
+  background:white;
+  border-radius:20px;
+  margin-bottom:20px;
+}
+
+.panel{
+  background:white;
+  border-radius:20px;
+  padding:20px;
+  box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+
+.bar{
+  width:100%;
+  height:25px;
+  background:#ddd;
+  border-radius:20px;
+  overflow:hidden;
+  margin-bottom:15px;
+}
+
+.fill{
+  height:100%;
+}
+
+.hunger{
+  background:#ffb703;
+}
+
+.happy{
+  background:#06d6a0;
+}
+
+button{
+  padding:10px 20px;
+  margin:5px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:.9;
+}
+
+input{
+  padding:10px;
+  border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🐱 NyaLife Phase2A</h1>
+
+<div id="scene"></div>
+
+<div class="panel">
+
+<input
+  id="catName"
+  placeholder="猫の名前"
+/>
+
+<button onclick="saveName()">
+保存
+</button>
+
+<h2 id="displayName">
+たま
+</h2>
+
+<p>
+LV :
+<span id="level">1</span>
+</p>
+
+<p>
+EXP :
+<span id="xp">0</span>/100
+</p>
+
+<p>空腹度</p>
+
+<div class="bar">
+  <div
+    class="fill hunger"
+    id="hungerBar">
+  </div>
+</div>
+
+<p>幸福度</p>
+
+<div class="bar">
+  <div
+    class="fill happy"
+    id="happyBar">
+  </div>
+</div>
+
+<button onclick="feed()">
+🍖 ごはん
+</button>
+
+<button onclick="play()">
+🎾 遊ぶ
+</button>
+
+<button onclick="sleepCat()">
+💤 寝る
+</button>
+
+<p id="message"></p>
+
+</div>
+
+</div>
+
+https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.jsscript>
+
+<script>
+
+let cat={
+  name:"たま",
+  level:1,
+  xp:0,
+  hunger:50,
+  happy:50
+};
+
+const save=localStorage.getItem("nyalife");
+
+if(save){
+  cat=JSON.parse(save);
+}
+
+function saveGame(){
+  localStorage.setItem(
+    "nyalife",
+    JSON.stringify(cat)
+  );
+}
+
+function updateUI(){
+
+  displayName.textContent=
+    cat.name;
+
+  level.textContent=
+    cat.level;
+
+  xp.textContent=
+    cat.xp;
+
+  hungerBar.style.width=
+    cat.hunger+"%";
+
+  happyBar.style.width=
+    cat.happy+"%";
+
+  saveGame();
+}
+
+function gainXP(amount){
+
+  cat.xp+=amount;
+
+  if(cat.xp>=100){
+
+    cat.level++;
+
+    cat.xp-=100;
+
+    message.textContent=
+      "🎉 レベルアップ！";
+  }
+
+  updateUI();
+}
+
+function feed(){
+
+  cat.hunger=
+    Math.min(100,cat.hunger+20);
+
+  gainXP(10);
+
+  message.textContent=
+    "😺 おいしいにゃ！";
+}
+
+function play(){
+
+  cat.happy=
+    Math.min(100,cat.happy+20);
+
+  gainXP(15);
+
+  message.textContent=
+    "😻 たのしいにゃ！";
+}
+
+function sleepCat(){
+
+  cat.happy=
+    Math.min(100,cat.happy+10);
+
+  cat.hunger=
+    Math.max(0,cat.hunger-5);
+
+  gainXP(8);
+
+  message.textContent=
+    "💤 ぐっすり";
+}
+
+function saveName(){
+
+  const name=
+    catName.value.trim();
+
+  if(name){
+
+    cat.name=name;
+
+    updateUI();
+  }
+}
+
+setInterval(()=>{
+
+  cat.hunger=
+    Math.max(0,cat.hunger-1);
+
+  cat.happy=
+    Math.max(0,cat.happy-1);
+
+  updateUI();
+
+},30000);
+
+updateUI();
+
+const container=
+ document.getElementById("scene");
+
+const scene=
+ new THREE.Scene();
+
+const camera=
+ new THREE.PerspectiveCamera(
+   75,
+   container.clientWidth/
+   container.clientHeight,
+   0.1,
+   1000
+ );
+
+const renderer=
+ new THREE.WebGLRenderer({
+   antialias:true
+ });
+
+renderer.setSize(
+  container.clientWidth,
+  container.clientHeight
+);
+
+container.appendChild(
+  renderer.domElement
+);
+
+const light=
+ new THREE.DirectionalLight(
+   0xffffff,
+   2
+ );
+
+light.position.set(5,5,5);
+
+scene.add(light);
+
+scene.add(
+ new THREE.AmbientLight(
+   0xffffff,
+   2
+ )
+);
+
+const group=
+ new THREE.Group();
+
+const head=
+ new THREE.Mesh(
+   new THREE.SphereGeometry(
+     1,
+     32,
+     32
+   ),
+   new THREE.MeshStandardMaterial({
+     color:0xffbe76
+   })
+ );
+
+group.add(head);
+
+const ear1=
+ new THREE.Mesh(
+   new THREE.ConeGeometry(
+     0.3,
+     0.6,
+     4
+   ),
+   new THREE.MeshStandardMaterial({
+     color:0xffbe76
+   })
+ );
+
+ear1.position.set(
+ -0.5,
+ 0.9,
+ 0
+ );
+
+group.add(ear1);
+
+const ear2=
+ ear1.clone();
+
+ear2.position.x=
+ 0.5;
+
+group.add(ear2);
+
+scene.add(group);
+
+camera.position.z=4;
+
+const raycaster=
+ new THREE.Raycaster();
+
+const mouse=
+ new THREE.Vector2();
+
+renderer.domElement
+.addEventListener(
+ "click",
+ (event)=>{
+
+ mouse.x=
+  (event.offsetX/
+   container.clientWidth)
+   *2-1;
+
+ mouse.y=
+  -(event.offsetY/
+   container.clientHeight)
+   *2+1;
+
+ raycaster.setFromCamera(
+  mouse,
+  camera
+ );
+
+ const hits=
+  raycaster.intersectObjects(
+   group.children
+  );
+
+ if(hits.length){
+
+   cat.happy=
+    Math.min(
+      100,
+      cat.happy+5
+    );
+
+   updateUI();
+
+   message.textContent=
+    "😸 なでてもらった！";
+ }
+});
+
+function animate(){
+
+ requestAnimationFrame(
+  animate
+ );
+
+ group.rotation.y+=0.01;
+
+ renderer.render(
+  scene,
+  camera
+ );
+}
+
+animate();
+
+</script>
+
+</body>
+</html>
