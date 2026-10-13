@@ -26,7 +26,8 @@
     .panel{background:var(--panel);border:3px solid var(--panel-border);border-radius:20px;padding:16px;box-shadow:0 12px 28px var(--shadow)}
     .stage{position:relative;height:320px;border-radius:18px;background:linear-gradient(180deg,#fdfbf7,#ebf6ff);overflow:hidden;border:2px dashed #f3d9a6}
 
-    .cat{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);font-size:120px;line-height:1;user-select:none;display:grid;place-items:center}
+    .cat{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);width:160px;height:160px;display:grid;place-items:center;user-select:none}
+    .cat img{width:160px;height:160px;image-rendering:pixelated;display:block}
     .speech{position:absolute;right:12px;top:12px;background:rgba(255,255,255,0.9);border:2px solid var(--panel-border);border-radius:14px;padding:8px 10px;font-weight:800;color:var(--muted)}
 
     /* Stats and bars larger for touch */
@@ -67,7 +68,7 @@
       .mobile-bar{display:flex;gap:6px}
       .app{padding-bottom:140px}
       h1{font-size:1.4rem}
-      .cat{font-size:110px;bottom:68px}
+      .cat{width:140px;height:140px;font-size:110px;bottom:68px}
       .stage{height:300px}
       .bars .bar-frame{height:20px}
       button{font-size:0.98rem}
@@ -91,7 +92,9 @@
       <section class="panel">
         <div class="stage">
           <div class="speech" id="speechBox">にゃー！</div>
-          <div class="cat" id="catFace">🐱</div>
+          <div class="cat" id="catFace">
+            <img id="catSprite" alt="pixel cat">
+          </div>
         </div>
 
         <div class="bars">
@@ -159,6 +162,73 @@
     const STORAGE_KEY = "nyalife-rpg-mobile-v3";
     const defaultState = {name:"たま",level:1,xp:0,hunger:70,happiness:75,energy:80,coins:0,day:1,log:["今日も元気に過ごしてるにゃ！"],eventMood:"普通"};
 
+    // --- SVG frames for a simple pixel-art cat ---
+    const frameSVGs = [];
+
+    // Frame 1: neutral
+    frameSVGs.push(`
+      <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'>
+        <rect width='16' height='16' fill='transparent' />
+        <!-- body -->
+        <rect x='3' y='1' width='10' height='1' fill='%23ffcc99'/>
+        <rect x='2' y='2' width='12' height='1' fill='%23ffcc99'/>
+        <rect x='1' y='3' width='14' height='3' fill='%23ffcc99'/>
+        <rect x='2' y='6' width='12' height='3' fill='%23ffcc99'/>
+        <rect x='3' y='9' width='10' height='3' fill='%23ffcc99'/>
+        <!-- ears (pink tips) -->
+        <rect x='2' y='2' width='1' height='1' fill='%23ff9fb0'/>
+        <rect x='13' y='2' width='1' height='1' fill='%23ff9fb0'/>
+        <!-- eyes -->
+        <rect x='5' y='5' width='1' height='1' fill='%23000000'/>
+        <rect x='10' y='5' width='1' height='1' fill='%23000000'/>
+        <!-- mouth -->
+        <rect x='8' y='7' width='1' height='1' fill='%237a5238'/>
+      </svg>
+    `);
+
+    // Frame 2: blink (eyes closed)
+    frameSVGs.push(`
+      <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'>
+        <rect width='16' height='16' fill='transparent' />
+        <rect x='3' y='1' width='10' height='1' fill='%23ffcc99'/>
+        <rect x='2' y='2' width='12' height='1' fill='%23ffcc99'/>
+        <rect x='1' y='3' width='14' height='3' fill='%23ffcc99'/>
+        <rect x='2' y='6' width='12' height='3' fill='%23ffcc99'/>
+        <rect x='3' y='9' width='10' height='3' fill='%23ffcc99'/>
+        <rect x='2' y='2' width='1' height='1' fill='%23ff9fb0'/>
+        <rect x='13' y='2' width='1' height='1' fill='%23ff9fb0'/>
+        <!-- closed eyes (lines) -->
+        <rect x='5' y='5' width='2' height='1' fill='%237a5238'/>
+        <rect x='9' y='5' width='2' height='1' fill='%237a5238'/>
+        <rect x='8' y='7' width='1' height='1' fill='%237a5238'/>
+      </svg>
+    `);
+
+    // Frame 3: paw up
+    frameSVGs.push(`
+      <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'>
+        <rect width='16' height='16' fill='transparent' />
+        <rect x='3' y='1' width='10' height='1' fill='%23ffcc99'/>
+        <rect x='2' y='2' width='12' height='1' fill='%23ffcc99'/>
+        <rect x='1' y='3' width='14' height='3' fill='%23ffcc99'/>
+        <!-- paw raised: clear a pixel and draw paw -->
+        <rect x='2' y='6' width='10' height='1' fill='%23ffcc99'/>
+        <rect x='11' y='6' width='3' height='2' fill='%23ffcc99'/>
+        <rect x='3' y='9' width='10' height='3' fill='%23ffcc99'/>
+        <rect x='2' y='2' width='1' height='1' fill='%23ff9fb0'/>
+        <rect x='13' y='2' width='1' height='1' fill='%23ff9fb0'/>
+        <rect x='5' y='5' width='1' height='1' fill='%23000000'/>
+        <rect x='10' y='5' width='1' height='1' fill='%23000000'/>
+        <rect x='8' y='7' width='1' height='1' fill='%237a5238'/>
+      </svg>
+    `);
+
+    // Convert SVG string -> data URL when needed
+    function svgToDataUrl(svg) {
+      return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+    }
+
+    // --- Game state & UI ---
     function clamp(v,a,b){return Math.min(Math.max(v,a),b)}
     function loadState(){try{const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return JSON.parse(JSON.stringify(defaultState));return {...JSON.parse(JSON.stringify(defaultState)),...JSON.parse(raw)} }catch(e){console.warn(e);return JSON.parse(JSON.stringify(defaultState))}}
     function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
@@ -167,13 +237,60 @@
     function getCatFace(){const m=getMoodText();if(m.includes("眠"))return"😴";if(m.includes("お腹"))return"😿";if(m.includes("さみ"))return"😹";if(m.includes("最高"))return"😺";return"🐱"}
 
     function gainXP(a){state.xp+=a;while(state.xp>=100){state.xp-=100;state.level+=1;state.coins+=10;addLog(`レベルアップ！ Lv.${state.level} にゃ！`);}}
-    function updateUI(){const h=clamp(state.hunger,0,100),p=clamp(state.happiness,0,100),e=clamp(state.energy,0,100);document.getElementById('dayValue').textContent=String(state.day);document.getElementById('coinValue').textContent=String(state.coins);document.getElementById('catName').textContent=state.name;document.getElementById('levelValue').textContent=String(state.level);document.getElementById('hungerText').textContent=`${h}%`;document.getElementById('happinessText').textContent=`${p}%`;document.getElementById('energyText').textContent=`${e}%`;document.getElementById('hungerBar').style.width=`${h}%`;document.getElementById('happinessBar').style.width=`${p}%`;document.getElementById('energyBar').style.width=`${e}%`;document.getElementById('eventText').textContent=`今日の運勢：${state.eventMood}`;document.getElementById('speechBox').textContent=getMoodText();document.getElementById('catFace').textContent=getCatFace();const log=document.getElementById('logList');log.innerHTML='';state.log.forEach(entry=>{const li=document.createElement('li');li.textContent=entry;log.appendChild(li)});}
+    function updateUI(){const h=clamp(state.hunger,0,100),p=clamp(state.happiness,0,100),e=clamp(state.energy,0,100);document.getElementById('dayValue').textContent=String(state.day);document.getElementById('coinValue').textContent=String(state.coins);document.getElementById('catName').textContent=state.name;document.getElementById('levelValue').textContent=String(state.level);document.getElementById('hungerText').textContent=`${h}%`;document.getElementById('happinessText').textContent=`${p}%`;document.getElementById('energyText').textContent=`${e}%`;document.getElementById('hungerBar').style.width=`${h}%`;document.getElementById('happinessBar').style.width=`${p}%`;document.getElementById('energyBar').style.width=`${e}%`;document.getElementById('eventText').textContent=`今日の運勢：${state.eventMood}`;document.getElementById('speechBox').textContent=getMoodText();document.getElementById('catFace').setAttribute('aria-label',getMoodText());updateSprite();const log=document.getElementById('logList');log.innerHTML='';state.log.forEach(entry=>{const li=document.createElement('li');li.textContent=entry;log.appendChild(li)});}
+
+    // Sprite animation: cycle frames while idle; when performing actions, trigger a short animation
+    const spriteEl = document.getElementById('catSprite');
+    let spriteIndex = 0;
+    let spriteTimer = null;
+    let idleInterval = 500; // ms between frames
+
+    function updateSprite(){
+      // choose frame based on current mood occasionally
+      if(!spriteEl) return;
+      spriteEl.src = svgToDataUrl(frameSVGs[spriteIndex % frameSVGs.length]);
+    }
+
+    function startIdleAnimation(){
+      if(spriteTimer) clearInterval(spriteTimer);
+      spriteTimer = setInterval(()=>{
+        // small bob effect with CSS transform
+        const cat = document.getElementById('catFace');
+        if(cat) cat.style.transform = 'translateX(-50%) translateY(-6px)';
+        setTimeout(()=>{ if(cat) cat.style.transform = 'translateX(-50%) translateY(0)'; }, 260);
+
+        spriteIndex = (spriteIndex + 1) % frameSVGs.length;
+        updateSprite();
+      }, idleInterval);
+    }
+
+    function playActionAnimation(frames = [0,2,0], frameMs = 160){
+      if(spriteTimer) clearInterval(spriteTimer);
+      let i = 0;
+      const seq = setInterval(()=>{
+        spriteIndex = frames[i % frames.length];
+        updateSprite();
+        i++;
+        if(i >= frames.length){
+          clearInterval(seq);
+          startIdleAnimation();
+        }
+      }, frameMs);
+    }
 
     function randomEvent(){const ev=[{text:'お散歩でコウラさんと出会ったにゃ！',mood:'いい日',bonus:{coins:8,happiness:6}},{text:'日向ぼっこで大満足だったにゃ。',mood:'晴れ',bonus:{happiness:12}},{text:'キッチンでおやつの匂いを嗅いだにゃ！',mood:'ラッキー',bonus:{hunger:10,coins:5}},{text:'小さな声で「もっと遊んで」と言ってるにゃ。',mood:'普通',bonus:{happiness:8}}];const pick=ev[Math.floor(Math.random()*ev.length)];state.eventMood=pick.mood;if(pick.bonus.coins)state.coins+=pick.bonus.coins;if(pick.bonus.happiness)state.happiness=clamp(state.happiness+pick.bonus.happiness,0,100);if(pick.bonus.hunger)state.hunger=clamp(state.hunger+pick.bonus.hunger,0,100);addLog(pick.text);setMessage(pick.text);saveState();updateUI()}
 
     function setMessage(m){document.getElementById('messageBox')?.textContent=m}
 
-    function performAction(type){if(type==='feed'){state.hunger=clamp(state.hunger+22,0,100);state.happiness=clamp(state.happiness+8,0,100);gainXP(12);addLog('ご飯で満腹になったにゃ！');setMessage('おいしいごはんで、満足そうな顔にゃ！')}if(type==='play'){state.happiness=clamp(state.happiness+20,0,100);state.energy=clamp(state.energy-12,0,100);state.hunger=clamp(state.hunger-8,0,100);gainXP(16);addLog('遊んで楽しかったにゃ！');setMessage('おもいっきり遊んで、にゃんと笑ってるにゃ！')}if(type==='pet'){state.happiness=clamp(state.happiness+14,0,100);state.energy=clamp(state.energy+5,0,100);gainXP(8);addLog('なでられて幸せにゃ');setMessage('なでるとすぐに甘えてくる、最高のパートナーにゃ！')}if(type==='sleep'){state.energy=clamp(state.energy+28,0,100);state.hunger=clamp(state.hunger-10,0,100);state.happiness=clamp(state.happiness+6,0,100);gainXP(10);addLog('ぐっすり眠って元気になったにゃ');setMessage('良い夢を見て、すっかりリフレッシュしたにゃ！')}if(type==='shop'){if(state.coins>=15){state.coins-=15;state.happiness=clamp(state.happiness+12,0,100);state.hunger=clamp(state.hunger+8,0,100);gainXP(12);addLog('おや���を買って喜んだにゃ！');setMessage('豪華おやつでさらに幸せにゃ！')}else{addLog('コインが足りないにゃ…');setMessage('おやつを買うにはコインが15必要だにゃ')}}state.day+=1;saveState();updateUI()}
+    function performAction(type){
+      if(type==='feed'){state.hunger=clamp(state.hunger+22,0,100);state.happiness=clamp(state.happiness+8,0,100);gainXP(12);addLog('ご飯で満腹になったにゃ！');setMessage('おいしいごはんで、満足そうな顔にゃ！');playActionAnimation([2,0,1,0],140)}
+      if(type==='play'){state.happiness=clamp(state.happiness+20,0,100);state.energy=clamp(state.energy-12,0,100);state.hunger=clamp(state.hunger-8,0,100);gainXP(16);addLog('遊んで楽しかったにゃ！');setMessage('おもいっきり遊んで、にゃんと笑ってるにゃ！');playActionAnimation([0,2,0,2,0],120)}
+      if(type==='pet'){state.happiness=clamp(state.happiness+14,0,100);state.energy=clamp(state.energy+5,0,100);gainXP(8);addLog('なでられて幸せにゃ');setMessage('なでるとすぐに甘えてくる、最高のパートナーにゃ！');playActionAnimation([1,0,1],220)}
+      if(type==='sleep'){state.energy=clamp(state.energy+28,0,100);state.hunger=clamp(state.hunger-10,0,100);state.happiness=clamp(state.happiness+6,0,100);gainXP(10);addLog('ぐっすり眠って元気になったにゃ');setMessage('良い夢を見て、��っかりリフレッシュしたにゃ！');playActionAnimation([1,1,0],300)}
+      if(type==='shop'){if(state.coins>=15){state.coins-=15;state.happiness=clamp(state.happiness+12,0,100);state.hunger=clamp(state.hunger+8,0,100);gainXP(12);addLog('おやつを買って喜んだにゃ！');setMessage('豪華おやつでさらに幸せにゃ！');playActionAnimation([2,0,2],120)}else{addLog('コインが足りないにゃ…');setMessage('おやつを買うにはコインが15必要だにゃ')}}
+
+      state.day+=1;saveState();updateUI();
+    }
 
     function tick(){state.hunger=clamp(state.hunger-3,0,100);state.happiness=clamp(state.happiness-2,0,100);state.energy=clamp(state.energy-2,0,100);if(Math.random()<0.18)randomEvent();if(state.hunger<=20){setMessage('お腹が空いてるにゃ…ごはんをあげてほしいにゃ')}else if(state.energy<=20){setMessage('疲れたにゃ…休ませてあげてほしいにゃ')}else if(state.happiness<=20){setMessage('少し寂しいにゃ…なでてあげてほしいにゃ')}saveState();updateUI()}
 
@@ -183,7 +300,15 @@
     document.getElementById('saveBtn')?.addEventListener('click',()=>{saveState();setMessage('セーブしたにゃ！')})
     document.getElementById('resetBtn')?.addEventListener('click',resetGame)
 
-    let state=loadState();updateUI();setMessage('ふわふわの猫ちゃんと、新しい日が始まるにゃ！');setInterval(tick,10000)
+    // Init
+    let state=loadState();
+    // start sprite and UI
+    spriteIndex = 0;
+    updateSprite();
+    startIdleAnimation();
+    updateUI();
+    setMessage('ふわふわの猫ちゃんと、新しい日が始まるにゃ！');
+    setInterval(tick,10000);
   </script>
 </body>
 </html>
