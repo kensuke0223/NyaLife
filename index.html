@@ -1,432 +1,543 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NyaLife</title>
+  <style>
+    :root {
+      --bg: #fff7ea;
+      --panel: #fffdf9;
+      --panel-border: #f3d7a1;
+      --ink: #41362d;
+      --muted: #7a6258;
+      --accent: #ffb86c;
+      --accent-2: #ff8c6b;
+      --good: #67c7a9;
+      --warn: #f5c75d;
+      --bad: #eb7f7f;
+      --shadow: rgba(92, 61, 39, 0.12);
+    }
 
-<title>NyaLife Phase2A</title>
+    * { box-sizing: border-box; }
 
-<style>
-body{
-  margin:0;
-  background:#fff2d7;
-  font-family:sans-serif;
-  text-align:center;
-}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #fff7ea, #ffe4c4 100%);
+      color: var(--ink);
+    }
 
-.container{
-  max-width:900px;
-  margin:auto;
-  padding:20px;
-}
+    .app {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 32px 20px 40px;
+    }
 
-#scene{
-  width:100%;
-  height:400px;
-  background:white;
-  border-radius:20px;
-  margin-bottom:20px;
-}
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
 
-.panel{
-  background:white;
-  border-radius:20px;
-  padding:20px;
-  box-shadow:0 5px 15px rgba(0,0,0,.1);
-}
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: 0.06em;
+    }
 
-.bar{
-  width:100%;
-  height:25px;
-  background:#ddd;
-  border-radius:20px;
-  overflow:hidden;
-  margin-bottom:15px;
-}
+    .chip {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #fff4d8;
+      border: 1px solid var(--panel-border);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
 
-.fill{
-  height:100%;
-}
+    .game {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 22px;
+    }
 
-.hunger{
-  background:#ffb703;
-}
+    .panel {
+      background: rgba(255, 255, 255, 0.78);
+      border: 3px solid var(--panel-border);
+      border-radius: 26px;
+      box-shadow: 0 12px 30px var(--shadow);
+      padding: 22px;
+    }
 
-.happy{
-  background:#06d6a0;
-}
+    .cat-stage {
+      position: relative;
+      height: 330px;
+      background: linear-gradient(180deg, #fffdf9, #f5f7ff);
+      border-radius: 22px;
+      border: 2px dashed #f0d8a9;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
 
-button{
-  padding:10px 20px;
-  margin:5px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
+    .cat-stage::before {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 70px;
+      background: linear-gradient(180deg, rgba(64, 123, 92, 0.1), rgba(64, 123, 92, 0.3));
+      border-radius: 22px 22px 0 0;
+    }
 
-button:hover{
-  opacity:.9;
-}
+    .cat-avatar {
+      position: relative;
+      z-index: 1;
+      font-size: 150px;
+      line-height: 1;
+      filter: drop-shadow(0 18px 12px rgba(110, 80, 50, 0.10));
+      animation: bob 2.6s ease-in-out infinite;
+      user-select: none;
+    }
 
-input{
-  padding:10px;
-  border-radius:10px;
-}
-</style>
+    @keyframes bob {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .cat-bubble {
+      position: absolute;
+      right: 18px;
+      top: 18px;
+      z-index: 2;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.85);
+      border: 2px solid #f1d9aa;
+      font-weight: 700;
+      box-shadow: 0 12px 18px rgba(100, 75, 50, 0.08);
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(100px, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .meta-card {
+      background: #fffdfb;
+      border: 2px solid #f5e2b8;
+      border-radius: 14px;
+      padding: 10px 12px;
+      text-align: center;
+    }
+
+    .meta-card .label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .meta-card strong {
+      font-size: 1.3rem;
+    }
+
+    .stats {
+      margin-top: 16px;
+    }
+
+    .stat-row {
+      margin-bottom: 12px;
+    }
+
+    .stat-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.92rem;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .bar {
+      position: relative;
+      height: 18px;
+      background: #f4efe7;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #e8dcc1;
+    }
+
+    .fill {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 50%;
+      border-radius: inherit;
+      transition: width 0.3s ease;
+    }
+
+    .hunger { background: linear-gradient(90deg, #ffb957, #ff8a65); }
+    .happiness { background: linear-gradient(90deg, #68d7b3, #46b7d8); }
+    .energy { background: linear-gradient(90deg, #b0a7ff, #7a8aff); }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.12s ease, filter 0.12s ease;
+      box-shadow: 0 8px 18px rgba(80, 55, 35, 0.08);
+    }
+
+    button:hover {
+      transform: translateY(-1px) scale(1.01);
+      filter: brightness(1.02);
+    }
+
+    .primary {
+      background: linear-gradient(135deg, #ffcf70, #ff9f6c);
+      color: #372719;
+    }
+
+    .secondary {
+      background: linear-gradient(135deg, #dff6ec, #b4ebd1);
+      color: #1d4d3e;
+    }
+
+    .danger {
+      background: linear-gradient(135deg, #ffd4d5, #ffb6b8);
+      color: #682b2b;
+    }
+
+    .message-box {
+      margin-top: 18px;
+      background: #fffaf2;
+      border: 2px solid #f1dfb7;
+      border-radius: 16px;
+      padding: 14px 16px;
+      line-height: 1.6;
+      min-height: 70px;
+      color: #483926;
+    }
+
+    .log {
+      list-style: none;
+      padding: 0;
+      margin: 18px 0 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .log li {
+      background: #fff8f0;
+      border: 1px solid #f0d7a6;
+      border-radius: 10px;
+      padding: 8px 10px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 780px) {
+      .game {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .meta {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="app">
+    <header>
+      <h1>🐾 NyaLife</h1>
+      <div class="chip" id="dayChip">Day 1</div>
+    </header>
 
-<div class="container">
+    <main class="game">
+      <section class="panel">
+        <div class="cat-stage">
+          <div class="cat-avatar" id="catAvatar">🐱</div>
+          <div class="cat-bubble" id="catMood">にゃー</div>
+        </div>
 
-<h1>🐱 NyaLife Phase2A</h1>
+        <div class="meta">
+          <div class="meta-card">
+            <span class="label">名前</span>
+            <strong id="catName">たま</strong>
+          </div>
+          <div class="meta-card">
+            <span class="label">レベル</span>
+            <strong id="level">1</strong>
+          </div>
+          <div class="meta-card">
+            <span class="label">EXP</span>
+            <strong id="xpText">0 / 100</strong>
+          </div>
+          <div class="meta-card">
+            <span class="label">状態</span>
+            <strong id="statusText">元気</strong>
+          </div>
+        </div>
 
-<div id="scene"></div>
+        <div class="stats">
+          <div class="stat-row">
+            <div class="stat-head">
+              <span>空腹度</span>
+              <span id="hungerValue">70%</span>
+            </div>
+            <div class="bar"><div id="hungerBar" class="fill hunger"></div></div>
+          </div>
 
-<div class="panel">
+          <div class="stat-row">
+            <div class="stat-head">
+              <span>幸福度</span>
+              <span id="happinessValue">75%</span>
+            </div>
+            <div class="bar"><div id="happinessBar" class="fill happiness"></div></div>
+          </div>
 
-<input
-  id="catName"
-  placeholder="猫の名前"
-/>
+          <div class="stat-row">
+            <div class="stat-head">
+              <span>体力</span>
+              <span id="energyValue">80%</span>
+            </div>
+            <div class="bar"><div id="energyBar" class="fill energy"></div></div>
+          </div>
+        </div>
+      </section>
 
-<button onclick="saveName()">
-保存
-</button>
+      <aside class="panel">
+        <div class="controls">
+          <button class="primary" data-action="feed">🍲 ごはん</button>
+          <button class="primary" data-action="play">🎾 遊ぶ</button>
+          <button class="primary" data-action="pet">🐾 なでる</button>
+          <button class="primary" data-action="sleep">💤 ねる</button>
+          <button class="secondary" id="saveBtn" type="button">💾 セーブ</button>
+          <button class="danger" id="resetBtn" type="button">🔄 リセット</button>
+        </div>
 
-<h2 id="displayName">
-たま
-</h2>
+        <div class="message-box" id="messageBox">
+          こんにちは！今日もよろしくにゃ。
+        </div>
 
-<p>
-LV :
-<span id="level">1</span>
-</p>
-
-<p>
-EXP :
-<span id="xp">0</span>/100
-</p>
-
-<p>空腹度</p>
-
-<div class="bar">
-  <div
-    class="fill hunger"
-    id="hungerBar">
+        <ul class="log" id="logList"></ul>
+      </aside>
+    </main>
   </div>
-</div>
 
-<p>幸福度</p>
+  <script>
+    const STORAGE_KEY = "nyalife-state-v1";
 
-<div class="bar">
-  <div
-    class="fill happy"
-    id="happyBar">
-  </div>
-</div>
+    const defaultState = {
+      name: "たま",
+      level: 1,
+      xp: 0,
+      hunger: 70,
+      happiness: 75,
+      energy: 80,
+      day: 1,
+      mood: "元気",
+      log: ["今日も元気に過ごしてるにゃ！"]
+    };
 
-<button onclick="feed()">
-🍖 ごはん
-</button>
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
 
-<button onclick="play()">
-🎾 遊ぶ
-</button>
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return null;
+        const parsed = JSON.parse(saved);
+        return { ...defaultState, ...parsed };
+      } catch (error) {
+        console.warn("セーブデータの読み込みに失敗:", error);
+        return null;
+      }
+    }
 
-<button onclick="sleepCat()">
-💤 寝る
-</button>
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
 
-<p id="message"></p>
+    function addLog(text) {
+      state.log.unshift(text);
+      state.log = state.log.slice(0, 6);
+    }
 
-</div>
+    function getMoodText() {
+      if (state.hunger < 25) return "お腹すいたにゃ";
+      if (state.happiness < 25) return "さみしいにゃ";
+      if (state.energy < 25) return "眠いにゃ";
+      if (state.happiness > 80 && state.hunger > 55) return "最高に幸せにゃ";
+      return "元気にゃ";
+    }
 
-</div>
+    function getAvatar() {
+      const mood = getMoodText();
+      if (mood.includes("眠")) return "😴";
+      if (mood.includes("お腹")) return "😿";
+      if (mood.includes("さみ")) return "😸";
+      if (mood.includes("最高")) return "😺";
+      return "🐱";
+    }
 
-https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.jsscript>
+    function gainXp(amount) {
+      state.xp += amount;
+      while (state.xp >= 100) {
+        state.xp -= 100;
+        state.level += 1;
+        addLog(`レベルアップ！現在 Lv.${state.level}`);
+      }
+    }
 
-<script>
+    function updateUI() {
+      const hunger = clamp(state.hunger, 0, 100);
+      const happiness = clamp(state.happiness, 0, 100);
+      const energy = clamp(state.energy, 0, 100);
 
-let cat={
-  name:"たま",
-  level:1,
-  xp:0,
-  hunger:50,
-  happy:50
-};
+      document.getElementById("catName").textContent = state.name;
+      document.getElementById("level").textContent = String(state.level);
+      document.getElementById("xpText").textContent = `${state.xp} / 100`;
+      document.getElementById("statusText").textContent = getMoodText();
+      document.getElementById("catMood").textContent = getMoodText();
+      document.getElementById("catAvatar").textContent = getAvatar();
+      document.getElementById("dayChip").textContent = `Day ${state.day}`;
 
-const save=localStorage.getItem("nyalife");
+      document.getElementById("hungerValue").textContent = `${hunger}%`;
+      document.getElementById("happinessValue").textContent = `${happiness}%`;
+      document.getElementById("energyValue").textContent = `${energy}%`;
 
-if(save){
-  cat=JSON.parse(save);
-}
+      document.getElementById("hungerBar").style.width = `${hunger}%`;
+      document.getElementById("happinessBar").style.width = `${happiness}%`;
+      document.getElementById("energyBar").style.width = `${energy}%`;
 
-function saveGame(){
-  localStorage.setItem(
-    "nyalife",
-    JSON.stringify(cat)
-  );
-}
+      const logList = document.getElementById("logList");
+      logList.innerHTML = "";
+      state.log.forEach((entry) => {
+        const li = document.createElement("li");
+        li.textContent = entry;
+        logList.appendChild(li);
+      });
+    }
 
-function updateUI(){
+    function setMessage(text) {
+      document.getElementById("messageBox").textContent = text;
+    }
 
-  displayName.textContent=
-    cat.name;
+    function act(type) {
+      if (type === "feed") {
+        state.hunger = clamp(state.hunger + 22, 0, 100);
+        state.energy = clamp(state.energy + 4, 0, 100);
+        state.happiness = clamp(state.happiness + 8, 0, 100);
+        gainXp(12);
+        addLog("ご飯を食べて満足したにゃ！");
+        setMessage("おいしいごはんでお腹がいっぱいになったにゃ！");
+      }
 
-  level.textContent=
-    cat.level;
+      if (type === "play") {
+        state.happiness = clamp(state.happiness + 20, 0, 100);
+        state.energy = clamp(state.energy - 12, 0, 100);
+        state.hunger = clamp(state.hunger - 8, 0, 100);
+        gainXp(15);
+        addLog("遊んでとても楽しそうにゃ！");
+        setMessage("おもいっきり遊んで、にゃんと笑ってるにゃ！");
+      }
 
-  xp.textContent=
-    cat.xp;
+      if (type === "pet") {
+        state.happiness = clamp(state.happiness + 14, 0, 100);
+        state.energy = clamp(state.energy + 4, 0, 100);
+        gainXp(8);
+        addLog("なでなでで心が満たされたにゃ");
+        setMessage("ちゅっとなでると、猫はとても幸せそうにゃ！");
+      }
 
-  hungerBar.style.width=
-    cat.hunger+"%";
+      if (type === "sleep") {
+        state.energy = clamp(state.energy + 26, 0, 100);
+        state.hunger = clamp(state.hunger - 10, 0, 100);
+        state.happiness = clamp(state.happiness + 5, 0, 100);
+        gainXp(9);
+        addLog("ぐっすり眠って、体力が回復したにゃ");
+        setMessage("よく眠って、今日も元気になったにゃ！");
+      }
 
-  happyBar.style.width=
-    cat.happy+"%";
+      state.day += 1;
+      saveState();
+      updateUI();
+    }
 
-  saveGame();
-}
+    function tick() {
+      state.hunger = clamp(state.hunger - 3, 0, 100);
+      state.happiness = clamp(state.happiness - 2, 0, 100);
+      state.energy = clamp(state.energy - 2, 0, 100);
 
-function gainXP(amount){
+      if (state.hunger <= 20) {
+        setMessage("お腹が空いてるにゃ…ごはんをあげてほしいにゃ");
+      } else if (state.energy <= 20) {
+        setMessage("疲れたにゃ…少し休ませてあげてほしいにゃ");
+      } else if (state.happiness <= 20) {
+        setMessage("少し寂しいにゃ…なでてあげてほしいにゃ");
+      }
 
-  cat.xp+=amount;
+      saveState();
+      updateUI();
+    }
 
-  if(cat.xp>=100){
+    function resetGame() {
+      const confirmed = window.confirm("本当にリセットしますか？");
+      if (!confirmed) return;
 
-    cat.level++;
+      const fresh = JSON.parse(JSON.stringify(defaultState));
+      Object.assign(state, fresh);
+      saveState();
+      updateUI();
+      setMessage("新しい生活がはじまったにゃ！");
+    }
 
-    cat.xp-=100;
+    document.querySelectorAll("[data-action]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const action = button.dataset.action;
+        act(action);
+      });
+    });
 
-    message.textContent=
-      "🎉 レベルアップ！";
-  }
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      saveState();
+      setMessage("セーブしたにゃ！");
+    });
 
-  updateUI();
-}
+    document.getElementById("resetBtn").addEventListener("click", resetGame);
 
-function feed(){
-
-  cat.hunger=
-    Math.min(100,cat.hunger+20);
-
-  gainXP(10);
-
-  message.textContent=
-    "😺 おいしいにゃ！";
-}
-
-function play(){
-
-  cat.happy=
-    Math.min(100,cat.happy+20);
-
-  gainXP(15);
-
-  message.textContent=
-    "😻 たのしいにゃ！";
-}
-
-function sleepCat(){
-
-  cat.happy=
-    Math.min(100,cat.happy+10);
-
-  cat.hunger=
-    Math.max(0,cat.hunger-5);
-
-  gainXP(8);
-
-  message.textContent=
-    "💤 ぐっすり";
-}
-
-function saveName(){
-
-  const name=
-    catName.value.trim();
-
-  if(name){
-
-    cat.name=name;
-
+    let state = loadState() || JSON.parse(JSON.stringify(defaultState));
     updateUI();
-  }
-}
-
-setInterval(()=>{
-
-  cat.hunger=
-    Math.max(0,cat.hunger-1);
-
-  cat.happy=
-    Math.max(0,cat.happy-1);
-
-  updateUI();
-
-},30000);
-
-updateUI();
-
-const container=
- document.getElementById("scene");
-
-const scene=
- new THREE.Scene();
-
-const camera=
- new THREE.PerspectiveCamera(
-   75,
-   container.clientWidth/
-   container.clientHeight,
-   0.1,
-   1000
- );
-
-const renderer=
- new THREE.WebGLRenderer({
-   antialias:true
- });
-
-renderer.setSize(
-  container.clientWidth,
-  container.clientHeight
-);
-
-container.appendChild(
-  renderer.domElement
-);
-
-const light=
- new THREE.DirectionalLight(
-   0xffffff,
-   2
- );
-
-light.position.set(5,5,5);
-
-scene.add(light);
-
-scene.add(
- new THREE.AmbientLight(
-   0xffffff,
-   2
- )
-);
-
-const group=
- new THREE.Group();
-
-const head=
- new THREE.Mesh(
-   new THREE.SphereGeometry(
-     1,
-     32,
-     32
-   ),
-   new THREE.MeshStandardMaterial({
-     color:0xffbe76
-   })
- );
-
-group.add(head);
-
-const ear1=
- new THREE.Mesh(
-   new THREE.ConeGeometry(
-     0.3,
-     0.6,
-     4
-   ),
-   new THREE.MeshStandardMaterial({
-     color:0xffbe76
-   })
- );
-
-ear1.position.set(
- -0.5,
- 0.9,
- 0
- );
-
-group.add(ear1);
-
-const ear2=
- ear1.clone();
-
-ear2.position.x=
- 0.5;
-
-group.add(ear2);
-
-scene.add(group);
-
-camera.position.z=4;
-
-const raycaster=
- new THREE.Raycaster();
-
-const mouse=
- new THREE.Vector2();
-
-renderer.domElement
-.addEventListener(
- "click",
- (event)=>{
-
- mouse.x=
-  (event.offsetX/
-   container.clientWidth)
-   *2-1;
-
- mouse.y=
-  -(event.offsetY/
-   container.clientHeight)
-   *2+1;
-
- raycaster.setFromCamera(
-  mouse,
-  camera
- );
-
- const hits=
-  raycaster.intersectObjects(
-   group.children
-  );
-
- if(hits.length){
-
-   cat.happy=
-    Math.min(
-      100,
-      cat.happy+5
-    );
-
-   updateUI();
-
-   message.textContent=
-    "😸 なでてもらった！";
- }
-});
-
-function animate(){
-
- requestAnimationFrame(
-  animate
- );
-
- group.rotation.y+=0.01;
-
- renderer.render(
-  scene,
-  camera
- );
-}
-
-animate();
-
-</script>
-
+    setMessage("こんにちは！今日もよろしくにゃ.");
+    setInterval(tick, 10000);
+  </script>
 </body>
 </html>
