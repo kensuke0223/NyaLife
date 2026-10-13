@@ -152,7 +152,6 @@
     const STORAGE_KEY = "nyalife-rpg-mobile-v3";
     const defaultState = {name:"たま",level:1,xp:0,hunger:70,happiness:75,energy:80,coins:0,day:1,log:["今日も元気に過ごしてるにゃ！"],eventMood:"普通"};
 
-    // Pixel-art cat frames: idle + dance + action states
     const frameSVGs = [
       `
       <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'>
@@ -200,7 +199,6 @@
         <rect x='8' y='7' width='1' height='1' fill='%237a5238'/>
       </svg>
       `,
-      // dance frame left
       `
       <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'>
         <rect width='16' height='16' fill='transparent' />
@@ -218,7 +216,6 @@
         <rect x='8' y='7' width='1' height='1' fill='%237a5238'/>
       </svg>
       `,
-      // dance frame right
       `
       <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'>
         <rect width='16' height='16' fill='transparent' />
@@ -239,12 +236,11 @@
     ];
 
     function svgToDataUrl(svg) { return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg); }
-
     function clamp(v,a,b){return Math.min(Math.max(v,a),b)}
     function loadState(){try{const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return JSON.parse(JSON.stringify(defaultState));return {...JSON.parse(JSON.stringify(defaultState)),...JSON.parse(raw)} }catch(e){console.warn(e);return JSON.parse(JSON.stringify(defaultState))}}
     function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
     function addLog(t){state.log.unshift(t);state.log=state.log.slice(0,6)}
-    function getMoodText(){if(state.hunger<25)return"お腹すいたにゃ";if(state.happiness<25)return"さみしいにゃ";if(state.energy<25)return"眠いにゃ";if(state.happiness>80&&state.hunger>55)return"最高に幸せ";return"元気"}
+    function getMoodText(){if(state.hunger<25)return"お腹すいたにゃ";if(state.happiness<25)return"さみしいにゃ";if(state.energy<25)return"眠い���ゃ";if(state.happiness>80&&state.hunger>55)return"最高に幸せ";return"元気"}
 
     function updateSprite(){
       const spriteEl = document.getElementById('catSprite');
@@ -257,7 +253,7 @@
       spriteTimer = setInterval(() => {
         const cat = document.getElementById('catFace');
         if(cat){
-          const sway = (Math.sin(Date.now()/180) * 6);
+          const sway = Math.sin(Date.now()/180) * 6;
           cat.style.transform = `translateX(-50%) rotate(${sway}deg) translateY(${Math.abs(Math.sin(Date.now()/280))*4}px)`;
         }
         spriteIndex = (spriteIndex + 1) % frameSVGs.length;
@@ -293,7 +289,7 @@
 
     function performAction(type){
       if(type==='feed'){state.hunger=clamp(state.hunger+22,0,100);state.happiness=clamp(state.happiness+8,0,100);gainXP(12);addLog('ご飯で満腹になったにゃ！');setMessage('おいしいごはんで、満足そうな顔にゃ！');playSequence([0,2,0,1,0],140)}
-      if(type==='play'){state.happiness=clamp(state.happiness+20,0,100);state.energy=clamp(state.energy-12,0,100);state.hunger=clamp(state.hunger-8,0,100);gainXP(16);addLog('遊んで楽しかったにゃ！');setMessage('おもいっきり遊んで、にゃんと笑ってるにゃ！');playSequence([3,4,3,4,0],120)}
+      if(type==='play'){state.happiness=clamp(state.happiness+20,0,100);state.energy=clamp(state.energy-12,0,100);state.hunger=clamp(state.hunger-8,0,100);gainXP(16);addLog('遊んで��しかったにゃ！');setMessage('おもいっきり遊んで、にゃんと笑ってるにゃ！');playSequence([3,4,3,4,0],120)}
       if(type==='pet'){state.happiness=clamp(state.happiness+14,0,100);state.energy=clamp(state.energy+5,0,100);gainXP(8);addLog('なでられて幸せにゃ');setMessage('なでるとすぐに甘えてくる、最高のパートナーにゃ！');playSequence([1,0,1,0],180)}
       if(type==='sleep'){state.energy=clamp(state.energy+28,0,100);state.hunger=clamp(state.hunger-10,0,100);state.happiness=clamp(state.happiness+6,0,100);gainXP(10);addLog('ぐっすり眠って元気になったにゃ');setMessage('良い夢を見て、すっかりリフレッシュしたにゃ！');playSequence([1,0,1,0],220)}
       if(type==='shop'){if(state.coins>=15){state.coins-=15;state.happiness=clamp(state.happiness+12,0,100);state.hunger=clamp(state.hunger+8,0,100);gainXP(12);addLog('おやつを買って喜んだにゃ！');setMessage('豪華おやつでさらに幸せにゃ！');playSequence([0,2,0,3,0],140)}else{addLog('コインが足りないにゃ…');setMessage('おやつを買うにはコインが15必要だにゃ')}}
